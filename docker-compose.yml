@@ -1,0 +1,47 @@
+
+services:
+  backend:
+    environment:
+      - FT_BASE_URL=http://localhost:8000
+      - FT_REDIS_HOST=127.0.0.1
+      - FT_REDIS_PORT=6379
+      - FT_DB_NAME=funticketdb
+      - FT_DB_USER=postgres
+      - FT_DB_PASSWORD=6@R#Vudz!bv#@z5eqMB2m!CuZ#8x8PsUV
+      - FT_DB_HOST=127.0.0.1
+      - FT_DB_PORT=5432
+    depends_on:
+      - db
+      - redis
+    ports:
+      - "8000:8000"
+    expose:
+      - 8000
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: core
+  db:
+    image: "postgis/postgis:17-3.4"
+    volumes:
+      - db:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_DB=funticketdb
+      - POSTGRES_PASSWORD=6@R#Vudz!bv#@z5eqMB2m!CuZ#8x8PsUV
+    expose:
+      - 5432
+    ports:
+      - "5432:5432"
+  redis:
+    image: "redis:7.4.1"
+    command: redis-server
+    volumes:
+      - redis:/data
+    expose:
+      - 6379
+    ports:
+      - "6379:6379"
+
+volumes:
+  db:
+  redis:
