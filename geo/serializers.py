@@ -75,4 +75,3 @@ class CityListSerializer(serializers.ModelSerializer):
             "province",
             "id"
         ]
-

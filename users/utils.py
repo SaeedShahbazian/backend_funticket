@@ -4,6 +4,7 @@ import random
 import re
 from string import ascii_lowercase, digits
 
+
 class InvalidPhoneNumber(Exception):
     pass
 

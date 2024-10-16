@@ -1,12 +1,13 @@
 from django.db import models
 from django_resized import ResizedImageField
-from django.utils.translation import gettext as _
-from PIL import Image as PilImage
+from django.utils.translation import gettext_lazy as _
+# from PIL import Image as PilImage
 from django.contrib.auth.models import AbstractUser
 from users.utils import generate_random_username
 
 from geo.models import City
 from media.models import Image
+
 
 class User(AbstractUser):
     FEMALE = 'f'
@@ -107,4 +108,3 @@ class Message(models.Model):
         related_name="message_senders",
         on_delete=models.PROTECT
     )
-

@@ -15,4 +15,3 @@ class UsersConfig(AppConfig):
             sender=self,
             dispatch_uid="users.management.create_groups"
         )
-
