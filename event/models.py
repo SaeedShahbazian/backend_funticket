@@ -1,9 +1,9 @@
-from threading import Thread
 from django.db import models
-
+from django.contrib.postgres.fields import ArrayField
+from comment.models import Thread
 from funticket.models import Rate
 from media.models import Image, Video
-
+from users.models import User
 
 EVENT_TYPES = (
     ('theater', 'Theater'),
@@ -34,6 +34,34 @@ class Person(models.Model):
         related_name='persons',
         null=True, blank=True
     )
+    likes = models.ManyToManyField(
+        User,
+        related_name='liked_person',
+        blank=True
+    )
+    dislikes = models.ManyToManyField(
+        User,
+        related_name='disliked_person',
+        blank=True
+    )
+    likes_count = models.IntegerField(default=0)
+    dislikes_count = models.IntegerField(default=0)
+    telegram_id = models.URLField(
+        max_length=200,
+        null=True,
+        blank=True,
+    )
+    instagram_id = models.URLField(
+        max_length=200,
+        null=True,
+        blank=True,
+    )
+    images = models.ManyToManyField(
+        Image,
+        related_name='image_person',
+        blank=True
+    )
+    biography = models.TextField(blank=True, null=True)
     birthdate = models.DateTimeField(null=True, blank=True)
 
     class Meta:
@@ -126,7 +154,7 @@ class Event(models.Model):
     )
     genres = models.ManyToManyField(
         Genre,
-        related_name='genres_event',
+        related_name='genre_event',
         blank=True
     )
     rates = models.ManyToManyField(
@@ -149,7 +177,8 @@ class Event(models.Model):
         related_name='video_events',
         blank=True
     )
-
+    rules = ArrayField(models.CharField(max_length=50, blank=True, null=True), blank=True, null=True)
+    Can_cancel_ticket = models.BooleanField(default=False)
     weight = models.FloatField(null=False, default=0.0)
     event_rate = models.FloatField(default=0)
     rate_sum_cache = models.FloatField(default=0)
@@ -206,3 +235,17 @@ class EventRole(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True, null=False, blank=False)
+
+
+class HomeActors(models.Model):
+    person = models.ForeignKey(
+        Person,
+        on_delete=models.CASCADE,
+        related_name='person_home_actors'
+    )
+    order = models.IntegerField(default=1000)
+    created_at = models.DateTimeField(auto_now_add=True)
+    modified_at = models.DateTimeField(auto_now=True, null=False, blank=False)
+
+    class Meta:
+        ordering = ['order']

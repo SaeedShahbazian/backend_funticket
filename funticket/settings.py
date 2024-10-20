@@ -92,9 +92,13 @@ INSTALLED_APPS = [
     'drf_yasg',
     'reversion',
     'leaflet',
+    'funticket',
     'media',
     'users',
     'geo',
+    'event',
+    'comment',
+    'place',
 
 ]
 
