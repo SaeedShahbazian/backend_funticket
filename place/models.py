@@ -6,7 +6,6 @@ from django.db.models import Q
 from media.models import Image
 from geo.models import City
 from comment.models import Thread
-from users.models import User
 
 
 FACILITIES_TYPES = (
@@ -216,6 +215,48 @@ class PlaceHall(models.Model):
         )
 
         return result.all()
+
+
+class ExternalPlace(models.Model):
+    GISHE = 'gishe'
+    SAMFA = 'samfa'
+    DRIVERS = (
+        (GISHE, _('Gishe')),
+        (SAMFA, _('SAMFA')),
+    )
+    driver = models.CharField(max_length=5, choices=DRIVERS)
+    external_id = models.CharField(max_length=10)
+    external_name = models.CharField(max_length=200)
+    place = models.ForeignKey(Place, on_delete=models.CASCADE, related_name='externals', null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    modified_at = models.DateTimeField(auto_now=True, null=False, blank=False)
+
+    class Meta:
+        unique_together = [
+            ['driver', 'external_id'],
+            ['driver', 'place']
+        ]
+
+
+class ExternalHallId(models.Model):
+    GISHE = 'gishe'
+    SAMFA = 'samfa'
+    DRIVERS = (
+        (GISHE, _('Gishe')),
+        (SAMFA, _('SAMFA')),
+    )
+    driver = models.CharField(max_length=5, choices=DRIVERS)
+    external_id = models.CharField(max_length=10)
+    external_name = models.CharField(max_length=200)
+    hall = models.ForeignKey(PlaceHall, on_delete=models.CASCADE, related_name='externals', null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    modified_at = models.DateTimeField(auto_now=True, null=False, blank=False)
+
+    class Meta:
+        unique_together = [
+            ['driver', 'external_id'],
+            ['driver', 'hall']
+        ]
 
 
 # class Ticket(models.Model):

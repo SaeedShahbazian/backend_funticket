@@ -1,8 +1,11 @@
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
+from django.utils.translation import gettext_lazy as _
+from django.core.validators import MaxValueValidator, MinValueValidator
 from comment.models import Thread
 from funticket.models import Rate
 from media.models import Image, Video
+from place.models import Place, PlaceHall
 from users.models import User
 
 EVENT_TYPES = (
@@ -63,6 +66,10 @@ class Person(models.Model):
     )
     biography = models.TextField(blank=True, null=True)
     birthdate = models.DateTimeField(null=True, blank=True)
+
+    legacy_id = models.IntegerField(blank=True, null=True, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    modified_at = models.DateTimeField(auto_now=True, null=False, blank=False)
 
     class Meta:
         ordering = ['-id']
@@ -249,3 +256,93 @@ class HomeActors(models.Model):
 
     class Meta:
         ordering = ['order']
+
+
+class EventSchedule(models.Model):
+    event = models.ForeignKey(
+        Event,
+        on_delete=models.CASCADE,
+        related_name="event_schedule"
+    )
+    place = models.ForeignKey(
+        Place,
+        on_delete=models.CASCADE,
+        related_name="place_schedule"
+    )
+    place_hall = models.ForeignKey(
+        PlaceHall,
+        on_delete=models.CASCADE,
+        related_name="place_hall_schedule"
+    )
+    online_fee = models.FloatField(
+        validators=[MinValueValidator(0.0), MaxValueValidator(1.0)],
+    )
+    vat = models.FloatField(
+        validators=[MinValueValidator(0.0), MaxValueValidator(1.0)],
+    )
+    start_at = models.DateTimeField(
+        null=False,
+        blank=False
+    )
+    discount_percent = models.IntegerField(
+        null=True,
+        blank=True
+    )
+    discount_amount = models.IntegerField(
+        null=True,
+        blank=True
+    )
+    starred_text = models.TextField(
+        null=True,
+        blank=True
+    )
+    enable = models.BooleanField(default=True)
+    min_price = models.PositiveIntegerField()
+    max_price = models.PositiveIntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    modified_at = models.DateTimeField(auto_now=True, null=False, blank=False)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['event', 'start_at']),
+        ]
+
+
+class ExternalEvent(models.Model):
+    GISHE = 'gishe'
+    SAMFA = 'samfa'
+    DRIVERS = (
+        (GISHE, _('Gishe')),
+        (SAMFA, _('SAMFA')),
+    )
+    driver = models.CharField(max_length=5, choices=DRIVERS)
+    external_id = models.CharField(max_length=30)
+    external_name = models.CharField(max_length=200)
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, null=True, blank=True, related_name='externals')
+    created_at = models.DateTimeField(auto_now_add=True)
+    modified_at = models.DateTimeField(auto_now=True, null=False, blank=False)
+
+    class Meta:
+        unique_together = [
+            ['driver', 'external_id'],
+        ]
+
+
+class ExternalSchedule(models.Model):
+    GISHE = 'gishe'
+    SAMFA = 'samfa'
+    DRIVERS = (
+        (GISHE, _('Gishe')),
+        (SAMFA, _('SAMFA')),
+    )
+    driver = models.CharField(max_length=5, choices=DRIVERS)
+    external_id = models.CharField(max_length=30)
+    external_name = models.CharField(max_length=200)
+    schedule = models.ForeignKey(EventSchedule, on_delete=models.PROTECT, related_name='externals')
+    created_at = models.DateTimeField(auto_now_add=True)
+    modified_at = models.DateTimeField(auto_now=True, null=False, blank=False)
+
+    class Meta:
+        unique_together = [
+            ['driver', 'external_id'],
+        ]

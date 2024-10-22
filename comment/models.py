@@ -88,6 +88,6 @@ class Comment(models.Model):
     dislikes_count = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True, null=False, blank=False)
-    
+
     # TODO     @classmethod
     # TODO  def list(cls, data):

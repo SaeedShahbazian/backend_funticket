@@ -18,3 +18,4 @@ Khayyam==3.0.17
 uwsgi==2.0.27
 setuptools==75.1.0
 requests==2.32.3
+mysql-connector-python==9.1.0

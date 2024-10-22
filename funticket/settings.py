@@ -41,6 +41,14 @@ DB_NAME = os.environ.get('FT_DB_NAME', 'funticketdb')
 DB_USER = os.environ.get('FT_DB_USER', 'postgres')
 DB_PASSWORD = os.environ.get('FT_DB_PASSWORD')
 
+# MYSQL Datebase
+MYSQL_SERVER = os.environ.get('FT_MYSQL_SERVER', 'localhost')
+MYSQL_PORT = int(os.environ.get('FT_MYSQL_PORT', '2765'))
+MYSQL_USER = os.environ.get('FT_MYSQL_USER', 'root')
+MYSQL_PASS = os.environ.get('FT_MYSQL_PASS', 'azad01azad01')
+MYSQL_DB = os.environ.get('FT_MYSQL_DB', 'fun_data')
+MYSQL_CHARSET = os.environ.get('FT_MYSQL_CHARSET', 'utf8')
+
 # Redis
 REDIS_HOST = os.environ.get('FT_REDIS_HOST', 'localhost')
 REDIS_PORT = int(os.environ.get('FT_REDIS_PORT', '6379'))
@@ -239,6 +247,7 @@ LOCALE_PATHS = [
     os.path.join(BASE_DIR, "locale"),
 ]
 
+
 # GDAL_LIBRARY_PATH = "/home/SAEED/lib/libgdal.so.31"
 
 if DEBUG is False:
@@ -250,4 +259,15 @@ if DEBUG is False:
     CSRF_TRUSTED_ORIGINS = os.environ.get('FT_TRUSTED_ORIGINS', "http://localhost").strip('"').split(' ')
     print(CSRF_TRUSTED_ORIGINS)
 
-print(DEBUG)
+
+# Cache
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://%s:%s/2" % (REDIS_HOST, REDIS_PORT),
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
