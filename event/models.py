@@ -20,9 +20,31 @@ class Genre(models.Model):
         blank=False,
         null=False,
     )
+    legacy_id = models.IntegerField(blank=True, null=True,)
 
     def __str__(self):
         return self.name
+
+
+class Category(models.Model):
+    name = models.CharField(
+        max_length=100,
+        blank=False,
+        null=False,
+    )
+    parent = models.ForeignKey(
+        'self',
+        related_name="category_parent",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True
+    )
+    legacy_id = models.IntegerField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    modified_at = models.DateTimeField(auto_now=True, null=False, blank=False)
+
+    class Meta:
+        verbose_name_plural = "Categories"
 
 
 class Person(models.Model):
@@ -162,7 +184,7 @@ class Event(models.Model):
     genres = models.ManyToManyField(
         Genre,
         related_name='genre_event',
-        blank=True
+        blank=True,
     )
     rates = models.ManyToManyField(
         Rate,
@@ -184,6 +206,13 @@ class Event(models.Model):
         related_name='video_events',
         blank=True
     )
+    categories = models.ManyToManyField(
+        Category,
+        related_name='categories_events',
+        blank=True
+    )
+    release_year = models.IntegerField(default=0, blank=True, null=True)
+    production_year = models.IntegerField(default=0, blank=True, null=True)
     rules = ArrayField(models.CharField(max_length=50, blank=True, null=True), blank=True, null=True)
     Can_cancel_ticket = models.BooleanField(default=False)
     weight = models.FloatField(null=False, default=0.0)
@@ -193,6 +222,7 @@ class Event(models.Model):
     duration = models.IntegerField(null=True, blank=True)
     users_rating = models.FloatField(null=True, blank=True)
     deleted_at = models.DateTimeField(null=True, blank=True,)
+    legacy_id = models.IntegerField(blank=True, null=True, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True, null=False, blank=False)
 
